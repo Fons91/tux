@@ -6,10 +6,14 @@ require 'mysql'
 class MysqlCon
  def initialize
  	begin
- 		@connection = Mysql.new 'localhost', 'root', 'password2'
+            user = ENV["athens_user"]
+            password = ENV["athens_pass"]
+            puts "user #{user}"
+
+ 		@connection = Mysql.new 'localhost', user , password
 	rescue Mysql::Error => e
-    	puts e.errno
-    	puts e.error    
+    	   puts e.errno
+    	   puts e.error
 	end
  end
  def mysqlQuery (query)
@@ -27,8 +31,8 @@ def init()
 	    con = Mysql.new 'localhost', 'root', 'password2'
 	    puts con.get_server_info
 	    rs = con.query 'SELECT VERSION()'
-	    puts rs.fetch_row    
-	    
+	    puts rs.fetch_row
+
 	rescue Mysql::Error => e
 	    puts e.errno
 	    puts e.error
@@ -54,7 +58,7 @@ end
 
 
 get "/modules" do
-  
+
   content_type :json
   get_modules_data
 end

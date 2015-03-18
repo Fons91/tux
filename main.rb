@@ -39,7 +39,6 @@ def get_semester_data(node_name)
       return result.to_json
 end
 
-<<<<<<< HEAD
 def get_modules
     query= "SELECT DISTINCT NODE_NAME  FROM TUM_LEMORA.ATHENS_GRADES;"
     query_result = settings.mysqlhandler.mysqlQuery(query)
@@ -48,7 +47,8 @@ def get_modules
         result << row[0].force_encoding('ISO-8859-1')
     }
     return result.to_json
-=======
+end
+
 def get_grades_data()
       query_result = settings.mysqlhandler.mysqlQuery('SELECT NODE_NAME,STUD_NOTE,count(STUD_NOTE) FROM TUM_LEMORA.ATHENS_GRADES GROUP BY NODE_NAME, STUD_NOTE;')
       result = []
@@ -87,11 +87,6 @@ def get_attendance_opt_data()
       }
       return result.to_json
 end
->>>>>>> 7503b81ecc71ad97f5c53bbb8303213d34514edb
-
-
-
-end
 
 
 get '/' do
@@ -110,11 +105,10 @@ get "/semester" do
   get_semester_data(node_name)
 end
 
-<<<<<<< HEAD
 get "/modules" do
     content_type :json
     get_modules
-=======
+end
 get "/modulesoptional" do
   content_type :json
   get_attendance_opt_data
@@ -126,6 +120,4 @@ end
 get "/grades" do
   content_type :json
   get_grades_data
->>>>>>> 7503b81ecc71ad97f5c53bbb8303213d34514edb
 end
-

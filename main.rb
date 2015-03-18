@@ -39,12 +39,35 @@ end
 def get_grades_data()
       query_result = settings.mysqlhandler.mysqlQuery('SELECT NODE_NAME,STUD_NOTE,count(STUD_NOTE) FROM TUM_LEMORA.ATHENS_GRADES GROUP BY NODE_NAME, STUD_NOTE;')
       result = []
+
+      single_count = 0
+      i=0
+      single_result = ''
       query_result.each{ |row|
-          single_result ={}
-          single_result["name"]  = row[0].force_encoding('ISO-8859-1')
-          single_result["grade"]  = row[1].force_encoding('ISO-8859-1')
-          single_result["count"]  = row[2].force_encoding('ISO-8859-1')
-          result << single_result
+          
+          if i==0
+            @module_name = row[0]
+            single_result += '"grades": [['
+            single_result += row[1].force_encoding('ISO-8859-1') + ',' + row[2].force_encoding('ISO-8859-1') + ']'
+            single_count += row[2].to_i
+            i++
+          else
+            if @module_name == row[0].force_encoding('ISO-8859-1');
+              single_result += ',[' + row[1].force_encoding('ISO-8859-1') + ',' + row[2].force_encoding('ISO-8859-1') + ']'
+              single_count += row[2].to_i
+            else 
+              single_result += '],"total":' + single_result.to_string
+              single_result += ', "name":"' + @module_name + '},'
+              result << single_result
+              @module_name = row[0]
+              single_result += '"grades": [['
+              single_result += row[1].force_encoding('ISO-8859-1') + ',' + row[2].force_encoding('ISO-8859-1') + ']'
+              single_count += row[2].to_i
+            end
+
+          end
+
+
       }
       return result.to_json
 end
@@ -81,7 +104,10 @@ get '/' do
  # erb :index,  :locals => {:data => data}
   send_file File.join(settings.public_folder, 'index.html')
 end
-
+get '/g' do
+ # erb :index,  :locals => {:data => data}
+  send_file File.join(settings.public_folder, 'grades.html')
+end
 
 
 get "/semester" do

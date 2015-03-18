@@ -122,6 +122,11 @@ get '/g' do
   send_file File.join(settings.public_folder, 'grades.html')
 end
 
+get '/gradeslite' do
+ # erb :index,  :locals => {:data => data}
+  send_file File.join(settings.public_folder, 'gradeslite.html')
+end
+
 
 get "/semester" do
   node_name = params[:node]
@@ -153,6 +158,5 @@ get "/modulesnonoptional" do
   get_attendance_nonopt_data
 end
 get "/grades" do
-  content_type :json
   get_grades_data
 end

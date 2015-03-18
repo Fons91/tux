@@ -1,65 +1,73 @@
 
-var margin = {top: 50, right: 20, bottom: 20, left: 100},
-width = 960 - margin.left - margin.right,
-height = 500 - margin.top - margin.bottom;
+  var svg ;
 
 function setupSemesterSVG(module){
+      var margin = {top: 50, right: 20, bottom: 20, left: 100},
+  width = 960 - margin.left - margin.right,
+  height = 500 - margin.top - margin.bottom;
 
-  var x = d3.scale.ordinal()
-      .rangeRoundBands([0, width], .1);
 
-  var y = d3.scale.linear()
-      .range([height, 0]);
+ var x = d3.scale.ordinal()
+    .rangeRoundBands([0, width], .1);
 
-  var xAxis = d3.svg.axis()
-      .scale(x)
-      .orient("bottom");
+var y = d3.scale.linear()
+    .range([height, 0]);
 
-  var yAxis = d3.svg.axis()
-      .scale(y)
-      .orient("left")
-      .ticks(10, "%");
+var xAxis = d3.svg.axis()
+    .scale(x)
+    .orient("bottom");
 
-  var svg = d3.select("#viewsvg").append("svg")
+var yAxis = d3.svg.axis()
+    .scale(y)
+    .orient("left")
+
+    if(svg!==undefined){
+          d3.select("#viewsvg").select("svg").remove()
+    }
+    svg= d3.select("#viewsvg").append("svg")
       .attr("width", width + margin.left + margin.right)
       .attr("height", height + margin.top + margin.bottom)
-    .append("g")
+      .append("g")
       .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+
+
 
 
   $.ajax({
         url:"/semester?node="+module,
         type: 'get',
-        success: function(result,status){
-        console.log("dasdsa ")
-          console.log(result);
+        success: function(data,status){
+          console.log("dasdsa ")
+          console.log(data);
+          x.domain(data.map(function(d) { console.log("data is ");console.log(d.sem);return parseInt(d.sem); }));
+          y.domain([0, d3.max(data, function(d) { return parseInt(d.count); })]);
+
+          svg.append("g")
+              .attr("class", "x axis")
+              .attr("transform", "translate(0," + height + ")")
+              .call(xAxis);
+
+          svg.append("g")
+              .attr("class", "y axis")
+              .call(yAxis)
+            .append("text")
+              .attr("transform", "rotate(-90)")
+              .attr("y", 6)
+              .attr("dy", ".71em")
+              .style("text-anchor", "end")
+              .text("Number of students");
+
+          svg.selectAll(".bar")
+              .data(data)
+            .enter().append("rect")
+              .attr("class", "bar")
+              .attr("x", function(d) { return x(d.sem); })
+              .attr("width", x.rangeBand())
+              .attr("y", function(d) { return y(d.count); })
+              .attr("height", function(d) { return height - y(d.count); });
 
 
-/*
-          x.domain(d3.extent(result, function(line) {return parseDate(line.split(",")[0]); }));
-          y.domain([0,d3.max(result, function(line) {  return +line.split(",")[1]; }) ]);
-
-         svg.append("g")
-          .attr("class", "x axis")
-          .attr("transform", "translate(0," + height + ")")
-          .call(xAxis);
-
-        svg.append("g")
-          .attr("class", "y axis")
-          .call(yAxis)
-          .append("text")
-          .attr("transform", "rotate(-90)")
-          .attr("y", 6)
-          .attr("dy", ".71em")
-          .style("text-anchor", "end")
-          .text("Views");
-
-        svg.append("path")
-          .datum(result)
-          .attr("class", "line")
-          .attr("d", line);
-
-*/
         },
         error: function(result,status){
 

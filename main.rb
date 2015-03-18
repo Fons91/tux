@@ -37,39 +37,37 @@ def get_semester_data()
 end
 
 def get_grades_data()
-      query_result = settings.mysqlhandler.mysqlQuery('SELECT NODE_NAME,STUD_NOTE,count(STUD_NOTE) FROM TUM_LEMORA.ATHENS_GRADES GROUP BY NODE_NAME, STUD_NOTE;')
-      result = []
+      query_result = settings.mysqlhandler.mysqlQuery("SELECT NODE_NAME,STUD_NOTE,count(STUD_NOTE) FROM TUM_LEMORA.ATHENS_GRADES GROUP BY NODE_NAME, STUD_NOTE;")
+      result = "[" 
 
       single_count = 0
       i=0
-      single_result = ''
+      single_result = ""
       query_result.each{ |row|
-          
           if i==0
             @module_name = row[0]
-            single_result += '"grades": [['
-            single_result += row[1].force_encoding('ISO-8859-1') + ',' + row[2].force_encoding('ISO-8859-1') + ']'
+            single_result += "{" + '"grades"' + ": [["
+            single_result += row[1].force_encoding("ISO-8859-1") + "," + row[2].force_encoding("ISO-8859-1") + "]"
             single_count += row[2].to_i
-            i++
+            i = 1
           else
-            if @module_name == row[0].force_encoding('ISO-8859-1');
-              single_result += ',[' + row[1].force_encoding('ISO-8859-1') + ',' + row[2].force_encoding('ISO-8859-1') + ']'
+            if @module_name == row[0].force_encoding("ISO-8859-1");
+              single_result += ",[" + row[1].force_encoding("ISO-8859-1") + "," + row[2].force_encoding("ISO-8859-1") + "]"
               single_count += row[2].to_i
             else 
-              single_result += '],"total":' + single_result.to_string
-              single_result += ', "name":"' + @module_name + '},'
+              single_result += "], " + '"total"' + ": " + single_count.to_s
+              single_result += ", " + '"name"' + ': "' + @module_name + '"}'
               result << single_result
+              single_count = 0
               @module_name = row[0]
-              single_result += '"grades": [['
-              single_result += row[1].force_encoding('ISO-8859-1') + ',' + row[2].force_encoding('ISO-8859-1') + ']'
+              single_result = ", {" + '"grades"' + ": [["
+              single_result += row[1].force_encoding("ISO-8859-1") + "," + row[2].force_encoding("ISO-8859-1") + "]"
               single_count += row[2].to_i
             end
-
           end
-
-
       }
-      return result.to_json
+      result << "]"
+      return result
 end
 
 def get_attendance_nonopt_data()

@@ -8,8 +8,6 @@ class MysqlCon
  	begin
             user = ENV["athens_user"]
             password = ENV["athens_pass"]
-            puts "user #{user}"
-
  		@connection = Mysql.new 'localhost', user , password
 	rescue Mysql::Error => e
     	   puts e.errno
@@ -17,38 +15,29 @@ class MysqlCon
 	end
  end
  def mysqlQuery (query)
- 	result = @connection.query(query)
- 	output = result.fetch_row
- #	@connection.close if @connection
- 	return output
+      result = []
+ 	query_result = @connection.query(query)
  end
 end
 
 set :public_folder, "./public"
+set :mysqlhandler , MysqlCon.new()
 
-def init()
-	begin
-	    con = Mysql.new 'localhost', 'root', 'password2'
-	    puts con.get_server_info
-	    rs = con.query 'SELECT VERSION()'
-	    puts rs.fetch_row
-
-	rescue Mysql::Error => e
-	    puts e.errno
-	    puts e.error
-	ensure
-	    con.close if con
-	end
+def get_semester_data()
+      query_result = settings.mysqlhandler.mysqlQuery('SELECT NODE_NAME,STUD_SEM,COUNT(*)  FROM TUM_LEMORA.ATHENS_GRADES GROUP by STUD_SEM,NODE_NAME;')
+      result = []
+      query_result.each{ |row|
+          single_result ={}
+          single_result["node"]  = row[0].force_encoding('ISO-8859-1')
+          single_result["sem"]  = row[1].force_encoding('ISO-8859-1')
+          single_result["count"]  = row[2].force_encoding('ISO-8859-1')
+          result << single_result
+      }
+      return result.to_json
 end
 
-mysqlhandler = MysqlCon.new()
-puts mysqlhandler.mysqlQuery('SELECT VERSION()')
-puts "hello"
-puts mysqlhandler.mysqlQuery('SELECT VERSION()')
 
-def get_modules_data()
-  "hello".to_json
-end
+
 
 get '/' do
  # erb :index,  :locals => {:data => data}
@@ -57,10 +46,9 @@ end
 
 
 
-get "/modules" do
-
+get "/semester" do
   content_type :json
-  get_modules_data
+  get_semester_data
 end
 
 

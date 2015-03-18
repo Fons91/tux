@@ -46,7 +46,10 @@ var yAxis = d3.svg.axis()
           svg.append("g")
               .attr("class", "x axis")
               .attr("transform", "translate(0," + height + ")")
-              .call(xAxis);
+              .call(xAxis)
+              .append("text")
+              .style("text-anchor", "start")
+              .text("Semester");
 
           svg.append("g")
               .attr("class", "y axis")
@@ -55,8 +58,7 @@ var yAxis = d3.svg.axis()
               .attr("transform", "rotate(-90)")
               .attr("y", 6)
               .attr("dy", ".71em")
-              .style("text-anchor", "end")
-              .text("Number of students");
+
 
           svg.selectAll(".bar")
               .data(data)

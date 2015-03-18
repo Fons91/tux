@@ -53,7 +53,7 @@ end
 
 def get_grades_data()
       query_result = settings.mysqlhandler.mysqlQuery("SELECT NODE_NAME,STUD_NOTE,count(STUD_NOTE) FROM TUM_LEMORA.ATHENS_GRADES GROUP BY NODE_NAME, STUD_NOTE;")
-      result = "[" 
+      result = "["
 
       single_count = 0
       i=0
@@ -69,7 +69,7 @@ def get_grades_data()
             if @module_name == row[0].force_encoding("ISO-8859-1");
               single_result += ",[" + row[1].force_encoding("ISO-8859-1") + "," + row[2].force_encoding("ISO-8859-1") + "]"
               single_count += row[2].to_i
-            else 
+            else
               single_result += "], " + '"total"' + ": " + single_count.to_s
               single_result += ", " + '"name"' + ': "' + @module_name + '"}'
               result << single_result
@@ -85,14 +85,15 @@ def get_grades_data()
       return result
 end
 
-def get_attendance_nonopt_data()
-      query_result = settings.mysqlhandler.mysqlQuery('SELECT ATTENDANCE_ACTIVE_STUDENTS, DEGREE_NAME, NODE_NAME FROM TUM_LEMORA.ATHENS_NODE_ATT_ACTSTUD a JOIN TUM_LEMORA.ATHENS_NODE b ON a.NODE_ID = b.NODE_ID JOIN TUM_LEMORA.ATHENS_MODULE_NODE c ON a.NODE_ID = c.NODE_ID AND c.SUBJECT_TYPE_REFID = "PFLICHT" JOIN TUM_LEMORA.ATHENS_CURRICULUM_VERSION AS d ON d.STP_STP_NR = c.STP_STP_NR;')
+def get_attendance_data(course)
+      puts course
+      query_result = settings.mysqlhandler.mysqlQuery("SELECT COUNT(*),NODE_NAME, a.STP_STP_NR FROM TUM_LEMORA.ATHENS_NODE AS a JOIN  TUM_LEMORA.ATHENS_NODE_ACTSTUD_ATT AS b WHERE   a.NODE_NAME=\"#{course}\" AND a.NODE_ID = b.NODE_ID GROUP BY a.STP_STP_NR;")
       result = []
       query_result.each{ |row|
           single_result ={}
           single_result["attendance"]  = row[0].force_encoding('ISO-8859-1')
-          single_result["degree"]  = row[1].force_encoding('ISO-8859-1')
-          single_result["name"]  = row[2].force_encoding('ISO-8859-1')
+          single_result["name"]  = row[1].force_encoding('ISO-8859-1')
+          single_result["study_plan"]  = row[2].force_encoding('ISO-8859-1')
           result << single_result
       }
       return result.to_json
@@ -139,9 +140,13 @@ get "/modules" do
     node_name = URI.unescape(node_name)
     get_modules(node_name)
 end
-get "/modulesoptional" do
+get "/study" do
   content_type :json
-  get_attendance_opt_data
+  course = params[:course]
+  if(!course.nil?)
+    course = URI.unescape(course)
+    get_attendance_data(course)
+  end
 end
 get "/modulesnonoptional" do
   content_type :json

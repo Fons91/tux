@@ -18,9 +18,45 @@
   <h1>Athens Project</h1>
   <p>...</p>
 </div>
-  </div>
+</div>
 
+<div class="input-group">
+  <span class="input-group-addon" id="basic-addon1">Module</span>
+  <input id="searchfield" type="text" class="form-control" placeholder="Username" aria-describedby="basic-addon1">
+</div>
 <div id="viewsvg"></div>
 </body>
+<script>
+    $.ajax({
+        url:"/modules",
+        type: 'get',
+        success: function(result,status){
+          console.log(result)
+           $("#searchfield").keyup(function(){
+            filter = $(this).val();
+            $(result).each(function(key,value){
+            console.log($(value).text());
+            if($(value).text().indexOf(filter) != 0){
+              $(value).hide();
+              }else{
+              $(value).show();
+                 }
+              })
+              })
+
+        },
+        error: function(result,status){
+
+          console.log(data);
+          console.log(status)
+        }
+
+      });
+
+
+
+
+</script>
 </html>
+
 

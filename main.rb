@@ -39,8 +39,10 @@ def get_semester_data(node_name)
       return result.to_json
 end
 
-def get_modules
-    query= "SELECT DISTINCT NODE_NAME  FROM TUM_LEMORA.ATHENS_GRADES;"
+def get_modules(node_name)
+    puts "in get modules #{node_name}"
+    query= "SELECT DISTINCT node_name  FROM TUM_LEMORA.ATHENS_GRADES WHERE node_name LIKE \'\% #{node_name}\%\';    "
+    puts query
     query_result = settings.mysqlhandler.mysqlQuery(query)
     result = []
     query_result.each{|row|
@@ -98,16 +100,20 @@ end
 
 get "/semester" do
   node_name = params[:node]
-  puts(node_name)
-  node_name = URI.unescape(node_name)
-    puts(node_name)
-  content_type :json
-  get_semester_data(node_name)
+  if(!node_name.nil?)
+    node_name = URI.unescape(node_name)
+    content_type :json
+    get_semester_data(node_name)
+  end
+
+
 end
 
 get "/modules" do
     content_type :json
-    get_modules
+    node_name = params[:term]
+    node_name = URI.unescape(node_name)
+    get_modules(node_name)
 end
 get "/modulesoptional" do
   content_type :json

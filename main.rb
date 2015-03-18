@@ -16,6 +16,7 @@ class MysqlCon
  end
  def mysqlQuery (query)
       result = []
+      @connection.escape_string(query)
  	query_result = @connection.query(query)
  end
 end
@@ -23,8 +24,10 @@ end
 set :public_folder, "./public"
 set :mysqlhandler , MysqlCon.new()
 
-def get_semester_data()
-      query_result = settings.mysqlhandler.mysqlQuery('SELECT NODE_NAME,STUD_SEM,COUNT(*)  FROM TUM_LEMORA.ATHENS_GRADES GROUP by STUD_SEM,NODE_NAME;')
+def get_semester_data(node_name)
+      query= "SELECT NODE_NAME,STUD_SEM,COUNT(*)  FROM TUM_LEMORA.ATHENS_GRADES WHERE NODE_NAME=\"#{node_name}\" GROUP by NODE_NAME,STUD_SEM;"
+      puts query
+      query_result = settings.mysqlhandler.mysqlQuery(query)
       result = []
       query_result.each{ |row|
           single_result ={}
@@ -36,7 +39,18 @@ def get_semester_data()
       return result.to_json
 end
 
+def get_modules
+    query= "SELECT DISTINCT NODE_NAME  FROM TUM_LEMORA.ATHENS_GRADES;"
+    query_result = settings.mysqlhandler.mysqlQuery(query)
+    result = []
+    query_result.each{|row|
+        result << row[0].force_encoding('ISO-8859-1')
+    }
+    return result.to_json
 
+
+
+end
 
 
 get '/' do
@@ -47,8 +61,16 @@ end
 
 
 get "/semester" do
+  node_name = params[:node]
+  puts(node_name)
+  node_name = URI.unescape(node_name)
+    puts(node_name)
   content_type :json
-  get_semester_data
+  get_semester_data(node_name)
 end
 
+get "/modules" do
+    content_type :json
+    get_modules
+end
 

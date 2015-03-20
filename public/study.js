@@ -1,6 +1,6 @@
 var svg ;
 
-function setupSemesterSVG(course){
+function setupStudySVG(course){
       var margin = {top: 50, right: 20, bottom: 20, left: 100},
   width = 960 - margin.left - margin.right,
   height = 500 - margin.top - margin.bottom;
@@ -47,6 +47,7 @@ var yAxis = d3.svg.axis()
               .call(xAxis)
 
 
+
           svg.append("g")
               .attr("class", "y axis")
               .call(yAxis)
@@ -54,6 +55,8 @@ var yAxis = d3.svg.axis()
               .attr("transform", "rotate(-90)")
               .attr("y", 6)
               .attr("dy", ".71em")
+              .style("text-anchor", "end")
+              .text("Number of students");
 
 
           svg.selectAll(".bar")
@@ -91,7 +94,7 @@ $(function() {
             console.log(element);
 
             if(element != '#') {
-                setupSemesterSVG(element);
+                setupStudySVG(element);
             }
 
         },

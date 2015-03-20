@@ -1,7 +1,6 @@
+var svg ;
 
-  var svg ;
-
-function setupSemesterSVG(module){
+function setupSemesterSVG(course){
       var margin = {top: 50, right: 20, bottom: 20, left: 100},
   width = 960 - margin.left - margin.right,
   height = 500 - margin.top - margin.bottom;
@@ -35,21 +34,18 @@ var yAxis = d3.svg.axis()
 
 
   $.ajax({
-        url:"/semester?node="+module,
+        url:"/study?course="+course,
         type: 'get',
         success: function(data,status){
-          console.log("dasdsa ")
           console.log(data);
-          x.domain(data.map(function(d) { console.log("data is ");console.log(d.sem);return parseInt(d.sem); }));
-          y.domain([0, d3.max(data, function(d) { return parseInt(d.count); })]);
+          x.domain(data.map(function(d) { console.log("data is ");console.log(d.study_plan);return parseInt(d.study_plan); }));
+          y.domain([0, d3.max(data, function(d) { return parseInt(d.attendance); })]);
 
           svg.append("g")
               .attr("class", "x axis")
               .attr("transform", "translate(0," + height + ")")
               .call(xAxis)
-              .append("text")
-              .style("text-anchor", "start")
-              .text("Semester");
+
 
           svg.append("g")
               .attr("class", "y axis")
@@ -64,10 +60,10 @@ var yAxis = d3.svg.axis()
               .data(data)
             .enter().append("rect")
               .attr("class", "bar")
-              .attr("x", function(d) { return x(d.sem); })
+              .attr("x", function(d) { return x(d.study_plan); })
               .attr("width", x.rangeBand())
-              .attr("y", function(d) { return y(d.count); })
-              .attr("height", function(d) { return height - y(d.count); });
+              .attr("y", function(d) { return y(d.attendance); })
+              .attr("height", function(d) { return height - y(d.attendance); });
 
 
         },

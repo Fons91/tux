@@ -5,44 +5,77 @@
 <script src="https://code.jquery.com/jquery-2.1.3.min.js" charset="utf-8"></script>
 <script src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js" charset="utf-8"></script>
 <link href="/style.css" rel="stylesheet" type="text/css">
+<link href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css"  rel="stylesheet" type="text/css">
+<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js" charset="utf-8"></script>
 <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
 </head>
 <body>
+
+<nav class="navbar navbar-default">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="#">
+        <img alt="Brand" src="/images/tux.png">
+      </a>
+    </div>
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li ><a href="/grades.html">Grades </a></li>
+        <li ><a href="/index.html">Semester </a></li>
+        <li><a href="/study.html">Study</a></li>
+      </ul>
+      </div>
+
+  </div>
+</nav>
+
+ <div class="container">
+    <div class="jumbotron">
+      <h1>Grades distribution per Module  </h1>
+      <p>Grades are distributed per module with the number of students that match a specific grade.</p>
+    </div>
+
+
+
+
+  <div id="viewsvg"></div>
+
+
 <script type="text/javascript">
 function truncate(str, maxLength, suffix) {
     if(str.length > maxLength) {
-        str = str.substring(0, maxLength + 1); 
+        str = str.substring(0, maxLength + 1);
         str = str.substring(0, Math.min(str.length, str.lastIndexOf(" ")));
         str = str + suffix;
     }
     return str;
 }
- 
+
 var margin = {top: 20, right: 200, bottom: 0, left: 20},
     width = 300,
     height = 650;
- 
+
 var start_grade = 1,
     end_grade = 4;
- 
+
 var c = d3.scale.category20c();
- 
+
 var x = d3.scale.linear()
     .range([0, width ]);
- 
+
 var xAxis = d3.svg.axis()
     .tickFormat(d3.format("d"))
     .scale(x)
     .orient("top");
 
- 
-var svg = d3.select("body").append("svg")
+
+var svg = d3.select("#viewsvg").append("svg")
     .attr("width", width + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom)
     .style("margin-left", margin.left + "px")
     .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
- 
+
     $.ajax({
         url:"/gradeslite",
         type: 'get',
@@ -54,37 +87,36 @@ var svg = d3.select("body").append("svg")
         var xScale = d3.scale.linear()
         .domain([start_grade, end_grade])
         .range([0, width]);
- 
+
     svg.append("g")
         .attr("class", "x axis")
         .attr("transform", "translate(0," + 0 + ")")
         .call(xAxis);
- 
+
     for (var j = 0; j < data.length; j++) {
-        console.log("dadsaddafss")
         console.log(data[0]);
         var g = svg.append("g").attr("class","journal");
- 
+
         var circles = g.selectAll("circle")
             .data(data[j]['grades'])
             .enter()
             .append("circle");
- 
+
         var text = g.selectAll("text")
             .data(data[j]['grades'])
             .enter()
             .append("text");
- 
+
         var rScale = d3.scale.linear()
             .domain([0, d3.max(data[j]['grades'], function(d) { return d[1]; })])
             .range([2, 9]);
- 
+
         circles
             .attr("cx", function(d, i) { return xScale(d[0]); })
             .attr("cy", j*20+20)
             .attr("r", function(d) { return rScale(d[1]); })
             .style("fill", function(d) { return c(j); });
- 
+
         text
             .attr("y", j*20+25)
             .attr("x",function(d, i) { return xScale(d[0])-5; })
@@ -92,7 +124,7 @@ var svg = d3.select("body").append("svg")
             .text(function(d){ return d[1]; })
             .style("fill", function(d) { return c(j); })
             .style("display","none");
- 
+
         g.append("text")
             .attr("y", j*20+25)
             .attr("x",width+20)
@@ -102,9 +134,9 @@ var svg = d3.select("body").append("svg")
             .on("mouseover", mouseover)
             .on("mouseout", mouseout);
         }
-    
 
-        }, 
+
+        },
         error: function(result,status){
 
           console.log(result);
@@ -112,13 +144,13 @@ var svg = d3.select("body").append("svg")
         }
 
       });
- 
+
     function mouseover(p) {
         var g = d3.select(this).node().parentNode;
         d3.select(g).selectAll("circle").style("display","none");
         d3.select(g).selectAll("text.value").style("display","block");
     }
- 
+
     function mouseout(p) {
         var g = d3.select(this).node().parentNode;
         d3.select(g).selectAll("circle").style("display","block");

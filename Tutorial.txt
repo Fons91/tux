@@ -1,0 +1,9 @@
+1)setup and start mysql server
+> mysqld
+2)download  and install ruby
+3) Edit the line 9 and 10 of main.rb file inserting the mysql credentials
+4)go to the folder of the project and run:
+> gem install bundler
+> bundle install
+5)run the application using
+>ruby main.rb

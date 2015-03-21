@@ -6,8 +6,8 @@ require 'mysql'
 class MysqlCon
  def initialize
  	begin
-            user = ENV["athens_user"]
-            password = ENV["athens_pass"]
+            user = "Insert here the name of the user which can access the TUM_LEMORA db"
+            password = "Insert here the passowrd of the user which can access the TUM_LEMORA db"
  		@connection = Mysql.new 'localhost', user , password
 	rescue Mysql::Error => e
     	   puts e.errno
